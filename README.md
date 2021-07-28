@@ -24,7 +24,7 @@ CREATE TABLE `mall_order` (
 ```
 - 表名；表字段(表字段名；类型；是否空；设置默认值；注释)；设置key与索引；设置存储引擎；设置编码
 
-#### 常用命令
+#### windows下mysql常用命令
 - net start mysql_cys : 启动mysql
 - mysql -u root -p : 登录mysql
 - show databases; : 显示数据库 
