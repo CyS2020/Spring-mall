@@ -232,8 +232,23 @@ cookie(sessionId)  ->   session(HttpSession)
 - 关于Linux命令, vim命令, docker命令的补充学习; java的http客户端学习
 - 外网无法访问的调试技巧curl http://127.0.0.1:8080/xxx接口xxx
 
-#### centos7环境
-- 配置静态网址, 每次启动虚拟机linux执行systemctl restart network.service连接外网
+### centos7环境
+#### 配置静态网址
+- VMware - 编辑 -虚拟网络编辑 -选择桥接模式 -桥接至主机网络适配器上；虚拟机网络适配器选桥接模式(不勾选)
+- dhclient命令生成ip，然后修改vim /etc/sysconfig/network-scripts/ifcfg-ens33
+- 配置静态ip地址，注意的是先查看主机ip地址信息配置子网掩码，网关，dns; 网络适配器等
+- 配置静态网址, 虚拟机linux执行systemctl restart network.service就可以连接外网
+- 虚拟机上网，主机与虚拟机互相ping，另外主机防火墙--文件和打印机共享(回显请求-ICMpv4-in)设为：是
+```
+BOOTPROTO=static
+ONBOOT=yes
+IPADDR=192.168.0.109
+NETMASK=255.255.255.0
+GATEWAY=192.168.0.1
+DNS1=192.168.1.1
+```
+
+#### 相关部署知识
 - 在root目录下: vim .bash_profile 根目录下配置环境变量并source .bash_profile
 - 配置环境变量后: 使用ngnix来启动Nginx服务端程序运行容器类似于Tomcat, 使用java运行jar包
 - systemctl status firewalld.service查看防火墙状态 systemctl stop firewalld.service关闭防火墙
