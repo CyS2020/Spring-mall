@@ -48,6 +48,21 @@ CREATE TABLE `mall_order` (
 #### 运行jar包
 - java -jar mall-0.0.1-SNAPSHOT.jar 命令运行主程序
 - java -cp [jar包的路径] [类路径] 命令行运行某个类
+```
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-shade-plugin</artifactId>
+    <version>2.4.3</version>
+    <executions>
+        <execution>
+            <phase>package</phase>
+            <goals>
+                <goal>shade</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
 
 #### 使用官网创建springBoot项目
 - https://start.spring.io/
