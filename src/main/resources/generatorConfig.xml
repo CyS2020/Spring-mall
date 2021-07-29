@@ -4,13 +4,13 @@
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 
 <generatorConfiguration>
-    <!-- 生成器的路径地址 -->
+    <!-- 配置连接数据库所用的驱动地址 -->
     <classPathEntry
             location="D:\Program Tools\apache-maven-3.6.3\repository\mysql\mysql-connector-java\8.0.17\mysql-connector-java-8.0.17.jar"/>
 
     <context id="DB2Tables" targetRuntime="MyBatis3">
 
-        <!-- 不在重复生成xml信息 不重复生成java配置在pom.xml文件中 -->
+        <!-- 该插件不在重复生成xml信息，不重复生成java代码的配置在pom.xml文件中了 -->
         <plugin type="org.mybatis.generator.plugins.UnmergeableXmlMappersPlugin"/>
 
         <!-- 无注释生成代码 -->
@@ -30,17 +30,17 @@
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
 
-        <!-- 生成pojo类的配置 -->
+        <!-- 1. 生成pojo类的配置 -->
         <javaModelGenerator targetPackage="com.imooc.mall.pojo" targetProject="src\main\java">
             <property name="enableSubPackages" value="true"/>
         </javaModelGenerator>
 
-        <!-- 生成xml文件的配置 -->
+        <!-- 2. 生成xml文件的配置 -->
         <sqlMapGenerator targetPackage="mappers" targetProject="src\main\resources">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
 
-        <!-- 生成dao接口的配置 -->
+        <!-- 3. 生成dao接口的配置 -->
         <javaClientGenerator type="XMLMAPPER" targetPackage="com.imooc.mall.dao" targetProject="src\main\java">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
@@ -58,6 +58,7 @@
         <!--            <columnOverride column="detail" jdbcType="VARCHAR"/>-->
         <!--            <columnOverride column="sub_images" jdbcType="VARCHAR"/>-->
         <!--        </table>-->
+        <!--        tableName表示哪张表，domainObjectName表示pojo的类，然后把关于example的内容(用于分页)置为false，生成的内容就没有它了-->
         <table tableName="mall_shipping" domainObjectName="Shipping" enableCountByExample="false"
                enableSelectByExample="false" enableDeleteByExample="false" enableUpdateByExample="false"/>
 

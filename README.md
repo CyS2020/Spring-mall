@@ -145,8 +145,12 @@ CREATE TABLE `mall_order` (
 - java代码与框架交互，要么通过注解要么配置xml, 将调用转向注解或者xml的具体行为，java定义抽象
 
 #### mybatis三剑客
-- Mybatis-generator: 用来生成pojo、mapper、xml文件
-- Mybatis-plugin: 用来查找方法对应的xml中的sql语句(Free MyBaits plugin)
+- Mybatis-generator: 用来生成pojo(类)、dao(接口)、mapper(xml)文件
+1. 需要配置generatorConfig.xml文件
+2. mvn mybatis-generator:generate 生成命令
+3. 插件会去连接数据库，找到表，然后生成表的类，查询接口，链接mysql的xml
+- Mybatis-plugin: 用来查找方法对应的xml中的sql语句
+1. 此款插件是在IDEA里安装的，替代品为：Free MyBaits plugin
 - Mybaits-PageHelper: 数据库分页插件
 
 #### Spring
@@ -159,12 +163,15 @@ CREATE TABLE `mall_order` (
 - 上述与new BigDecimal("0.01")等价, 注意查看源码实现
 
 #### 微信支付账户
-- appid: 微信公众账号或开放平台APP的唯一标识
+- Native支付，用户扫商户的二维码
+- appid: 微信公众账号或开放平台APP的唯一标识，一个应用可以对应多个支付产品
 - mch_id: 微信支付分配的商户收款账号
 - mchKey: 用于交易过程生成签名的密钥
 - notify_url: 用于接收微信发送的异步通知的链接(地址)
+- openid是微信用户在公众号appid下的唯一标识，appid不同获取到的openid就不同，公众号小程序必传参数
 
 #### 支付宝支付账户
+- 电脑网站支付，用户扫商户的二维码
 - 商户应用公钥、商户用用私钥(写入代码)、支付宝公钥(写入代码)、支付宝私钥(对于我们未知)
 - 发起支付: 商户(商户应用私钥签名) -> 支付宝(商户应用公钥验签) 
 - 异步通知: 支付宝(支付宝私钥签名) -> 商户(支付宝公钥验签)
@@ -174,7 +181,8 @@ CREATE TABLE `mall_order` (
 #### 转账过程
 - 建行(张三) -> 网联 -> 农行(李四) 给你转钱了(request请求)
 - 建行(张三) <- 网联 <- 农行(李四) 我收到钱了(request请求) 支付成功结果此处为准:即平台发来的异步通知
-- 跳转会直接跳到浏览器中打开, 而get请求会获得网页的html源码
+- 跳转会直接跳到浏览器中打开,参数放在url中,使用跳转发起支付场景, 而get请求会获得网页的html源码
+- 在浏览器中支付成功后，会收到支付平台的异步通知，然后支付系统(pay)在发异步通知给业务系统(mall)
 - 微信支付中模式二不需要在微信支付后台开发配置中设置扫码回调链接
 - notify_url是用来接收支付平台的异步通知的, notify_url不一定必须用域名, 也可以使用ip地址
 - 云服务器的公网ip可以直接访问系统, 家庭宽带公网ip也不行, 使用natapp软件
