@@ -48,6 +48,7 @@ CREATE TABLE `mall_order` (
 #### 运行jar包
 - java -jar mall-0.0.1-SNAPSHOT.jar 命令运行主程序
 - java -cp [jar包的路径] [类路径] 命令行运行某个类
+- 将所有依赖的包打在一起，使用下面的插件
 ```
 <plugin>
     <groupId>org.apache.maven.plugins</groupId>
