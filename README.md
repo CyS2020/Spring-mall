@@ -149,6 +149,7 @@ CREATE TABLE `mall_order` (
 1. 需要配置generatorConfig.xml文件
 2. mvn mybatis-generator:generate 生成命令
 3. 插件会去连接数据库，找到表，然后生成表的类，查询接口，链接mysql的xml
+4. 项目中会把使用mybatis插件生成代码的任务单独设置一个模块，不和业务代码扯在一起；mybatis依赖还是需要的
 - Mybatis-plugin: 用来查找方法对应的xml中的sql语句
 1. 此款插件是在IDEA里安装的，替代品为：Free MyBaits plugin
 - Mybaits-PageHelper: 数据库分页插件
@@ -176,17 +177,20 @@ HandlerMapping、Controller(单个Http请求处理过程中的控制器)和ViewR
 
 #### 支付宝支付账户
 - 电脑网站支付，用户扫商户的二维码
-- 商户应用公钥、商户用用私钥(写入代码)、支付宝公钥(写入代码)、支付宝私钥(对于我们未知)
+- 商户应用公钥、商户用用私钥(Java应用需要)、支付宝公钥(Java应用需要)、支付宝私钥(对于我们未知)
 - 发起支付: 商户(商户应用私钥签名) -> 支付宝(商户应用公钥验签) 
 - 异步通知: 支付宝(支付宝私钥签名) -> 商户(支付宝公钥验签)
-- 这种方式为RSA非对称加密, RSA签名不等于加密(java代码是不一样的), 支付内容加密一般使用AES密钥(对称)
+- 这种方式为RSA非对称加密(私钥签名-公钥验签), 支付内容加密一般使用AES密钥(对称)
 - app_id + private_key + ali_pay_public_key + notify_url + return_url
 
 ### 支付过程
 - 用户在购买物品的时候一般会选择微信或者支付宝进行支付
 - 因此在点击下单之后，需要发起微信/支付宝支付，支付完后微信/支付宝会把钱打到我们的账户
-- 根据设置好的微信支付账户/支付宝支付账户，传入订单信息调用其开放接口，会返回给我们一些用于生成二维码的文本信息
-- 拿到这个文本使用前端技术生成二维码，用户便可以扫码支付了，支付成功后微信/支付宝会发异步通知给我们
+- 根据设置好的微信支付账户/支付宝支付账户(对公账户)，传入订单信息调用其开放接口，会返回给我们一些用于生成二维码的文本信息，同步过程
+- 拿到这个文本使用前端技术生成二维码，用户便可以扫码支付了，支付成功后微信/支付宝会发异步通知给我们，异步过程
+- 关于二维码的生成，在拿到用于支付的文本信息后，可以使用后端技术也可以使用前端技术JQuery生成二维码，发起支付时需要跳转到浏览器中进行支付
+- 发起支付与异步通知是两次独立的http请求，一次是我们(pay)请求(post)微信/支付宝，返回用于生成二维码的链接，
+一次是微信/支付宝请求(post)我们(pay)，返回给他固定内容的文本(表示已经收到异步通知了)，可以使用retrofit客户端
 
 #### 转账过程
 - 建行(张三) -> 网联 -> 农行(李四) 给你转钱了(request请求)
@@ -204,7 +208,7 @@ HandlerMapping、Controller(单个Http请求处理过程中的控制器)和ViewR
      1111             3333       ->
 ```
 - 发起第二次支付前, 把上一次的支付订单关闭(调用支付平台的API)
-- ajax 请求后端的api(通过订单号查询支付状态), 如果是已支付则进行跳转
+- ajax(前端技术)请求后端的api(通过订单号查询支付状态), 如果是已支付则进行跳转；在我们返回的ftl界面里定时轮询请求后端api
 
 #### 模块的分割
 - 一般来说商城系统, 支付系统, 包括用于生产dao层和pojo的mybatis系统都是各自独立的
@@ -298,6 +302,7 @@ DNS1=192.168.1.1
 - `@Autowired` : 是spring动态装配bean的注解, 默认按照类型进行装配(byType)
 - `@ConfigurationProperties(prefix = "xxx")` : 参数配置在application.properties或application.yml文件中, 搭配@Component使用
 - `@SpringBootApplication` : 目的是开启自动配置 = @Configuration + @EnableAutoConfiguration + @ComponentScan。
+- `@MapperScan(basePackages = "com.xxx.xxx")` : 配置mybatis的数据库查询接口的注入，传入包的全路径
 <br/>
 
 - `@RequestMapping` : 映射HTTP请求，也就是通过它来指定控制器可以处理哪些URL请求, 主要有path、method、params属性
@@ -309,7 +314,8 @@ DNS1=192.168.1.1
 - `@RequestBody` : 用来接收前端传递给后端的json字符串中的数据的(请求体中的数据的), 前端使用POST方式进行提交, spring组装json为对象
 - `@RequestParam` : 用来处理body使用x-www-form-urlencoded来请求; url中的?后面参数也可以用@RequestParam来接收
 - `@ResponseBody` : 将java对象转为json格式的数据, 将controller的方法返回的对象通过适当的转换器转换为指定的格式之后，写入到response对象的body区
-- `@RestController` : 相当于@ResponseBody ＋ @Controller, @Controller注解会返回一个ModelAndView; 如果需要返回到指定页面, 则需要用 @Controller配合视图解析器InternalResourceViewResolver才行; 如果需要返回JSON，XML或自定义mediaType内容到页面，则需要在对应的方法上加上@ResponseBody注解。
+- `@RestController` : 相当于@ResponseBody ＋ @Controller, @Controller注解会返回一个ModelAndView; 如果需要返回到指定页面, 则需要用 
+@Controller配合视图解析器InternalResourceViewResolver才行; 如果需要返回JSON，XML或自定义mediaType内容到页面，则需要在对应的方法上加上@ResponseBody注解。
 <br/>
 
 - `@Valid` : 对象属性字段的规则检测, 对象属性需要进行验证; 在定义对象的字段上使用@NotNull、@NotBlank、@NotEmpty常用作入参检验
