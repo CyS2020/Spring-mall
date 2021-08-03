@@ -152,6 +152,7 @@ CREATE TABLE `mall_order` (
 4. 项目中会把使用mybatis插件生成代码的任务单独设置一个模块，不和业务代码扯在一起；mybatis依赖还是需要的
 - Mybatis-plugin: 用来查找方法对应的xml中的sql语句
 1. 此款插件是在IDEA里安装的，替代品为：Free MyBaits plugin
+2. 在xml文件手动编写xml语句时，如果编写正确插件的箭头就会指向对应的接口的
 - Mybaits-PageHelper: 数据库分页插件
 
 #### Spring
@@ -215,13 +216,15 @@ HandlerMapping、Controller(单个Http请求处理过程中的控制器)和ViewR
 - 此项目中为了(比较小)就没有将用mybatis生成dao层和pojo的系统独立出来, 商城系统-支付系统-MyBatis系统
 
 #### 用户模块开发
-- Content-Type:application/json 这是调用API的请求头
+- 如何查看是否前后端分离架构：F12 -> NetWork -> XHR -> Response
+- Content-Type:application/json 这是调用API的请求格式，在请求头中(Headers)
 - 开发顺序: Dao -> Service -> Controller
-- 单元测试: Service层(主要的业务逻辑)
-- Mybatis打印SQL语句
+- 单元测试: Service层(主要的业务逻辑)，Controller层的Api由测试人员负责
+- 对于无法自动生成的查询接口需要在xml文件中编写按照格式编写sql语句，Mybatis打印SQL语句
+- Spring中自带MD5散列算法DigestUtils类，实现对password的加密
 
 #### 前端请求方式
-- body使用x-www-form-urlencoded来请求: 后端可以使用对象中的域来接收(配合@RequestParam), 或者使用对象来接收(无需注解)
+- body使用x-www-form-urlencoded + key-value来请求: 后端可以使用对象中的域来接收(配合@RequestParam), 或者使用对象来接收(无需注解)
 - body使用raw + json格式来请求: 后端使用对象来接收(配合@RequestBody), 使用@Valid验证对象中字段是否符合要求, @NotBlank/@NotNull/@NotEmpty
 - url中使用的入参注解@PathVariable来绑定传入的参数, 不是url中带的则需要使用上面方式定义form对象来接收
 
@@ -231,6 +234,8 @@ HandlerMapping、Controller(单个Http请求处理过程中的控制器)和ViewR
 - 服务端需要通过session来识别具体的用户, 服务端要为特定用户创建特定的session, 用于标识这个用户并且跟踪
 - 那么问题来了session如何来识别具体的用户呢？客户端会将cookie信息发送到服务端, cookie里面记录一个Session ID
 - session是抽象的概念, cookie是具体的概念, cookie是session一种具体的实现方式
+- 会话跟踪cookie与session，可以理解为cookie是一个箱子，里面可以填内容信息；如果填具体信息那就是cookie客户端机制，如果是填sessionId具体信息存在服务器则是session机制
+- 在很多操作中都需要检查用户是否登录因此通过在代码中编写拦截器进行预检查(实现HandlerInterceptor.preHandle())还需配置拦截哪些url; 另外还可以用AOP的方式拦截
 ```
        前端        ->           后端
 cookie(sessionId)  ->   session(HttpSession)
@@ -291,6 +296,7 @@ DNS1=192.168.1.1
 #### `spring-boot-starter-test`
 - `@RunWith(SpringRunner.class)` : 注解是一个测试启动器，可以加载Springboot测试注解。
 - `@SpringBootTest` : 通过@RunWith 和 @SpringBootTest启动spring容器。
+- `@Transactional` : 这个是数据库事务的注解; 在单测中使用该注解避免修改数据库该注解会自动回滚，他会自动带有@Rollback(true)
 
 #### `spring-boot-starter-web`
 - `@Component` : 调用无参构造器创建一个bean对象, 并把对象存入spring的IOC容器, 交由spring容器进行管理
@@ -298,11 +304,13 @@ DNS1=192.168.1.1
 - `@Service` : 作用@Component相同, 一般用于业务层注解
 - `@Repository` : 作用@Component相同, 一般用于持久层注解
 - `@Bean` : 用于把当前方法的返回值作为bean对象存入spring的IOC容器中, 一般是需要初始化数据的类
-- `@Configuration` : 搭配@Bean使用在方法中设置必要信息, 一般用于配置类
+- `@Configuration` : 搭配@Bean使用在方法中设置必要信息, 一般用于配置类; 启动时即运行类中的方法
 - `@Autowired` : 是spring动态装配bean的注解, 默认按照类型进行装配(byType)
 - `@ConfigurationProperties(prefix = "xxx")` : 参数配置在application.properties或application.yml文件中, 搭配@Component使用
 - `@SpringBootApplication` : 目的是开启自动配置 = @Configuration + @EnableAutoConfiguration + @ComponentScan。
-- `@MapperScan(basePackages = "com.xxx.xxx")` : 配置mybatis的数据库查询接口的注入，传入包的全路径
+- `@ControllerAdvice` : 全局异常处理@ExceptionHandler, 添加全局数据@ModelAttribute, 请求参数预处理@InitBinder
+- `@ExceptionHandler(RuntimeException.class)` : 注解用来指明异常的处理类型, 如果这里指定为RuntimeException；可以更具体空指针数组越界之类的
+
 <br/>
 
 - `@RequestMapping` : 映射HTTP请求，也就是通过它来指定控制器可以处理哪些URL请求, 主要有path、method、params属性
@@ -314,16 +322,20 @@ DNS1=192.168.1.1
 - `@RequestBody` : 用来接收前端传递给后端的json字符串中的数据的(请求体中的数据的), 前端使用POST方式进行提交, spring组装json为对象
 - `@RequestParam` : 用来处理body使用x-www-form-urlencoded来请求; url中的?后面参数也可以用@RequestParam来接收
 - `@ResponseBody` : 将java对象转为json格式的数据, 将controller的方法返回的对象通过适当的转换器转换为指定的格式之后，写入到response对象的body区
+- `@ResponseStatus` : 用就是为了改变HTTP响应的状态码, 返回你指定的状态码
 - `@RestController` : 相当于@ResponseBody ＋ @Controller, @Controller注解会返回一个ModelAndView; 如果需要返回到指定页面, 则需要用 
 @Controller配合视图解析器InternalResourceViewResolver才行; 如果需要返回JSON，XML或自定义mediaType内容到页面，则需要在对应的方法上加上@ResponseBody注解。
 <br/>
-
-- `@Valid` : 对象属性字段的规则检测, 对象属性需要进行验证; 在定义对象的字段上使用@NotNull、@NotBlank、@NotEmpty常用作入参检验
 
 #### `mybatis-spring-boot-starter`
 - `@Mapper` : 添加了@Mapper注解之后这个接口在编译时会生成相应的实现类, 需要注意的是:这个接口中不可以定义同名的方法，因为会生成相同的id也就是说这个接口是不支持重载的
 - `@Select("select * from mall_category where id = #{id}")` : 对于多个参数来说, 每个参数之前都要加上@Param注解, 要不然会找不到对应的参数进而报错
 - `@MapperScan(basePackages = "xxx")` : 想要每个接口都要变成实现类, 那么需要在每个接口类上加上@Mapper注解比较麻烦解决这个问题用@MapperScan, 是在Springboot启动类上面添加
+
+#### 其他注解
+- `@Valid` : 对象属性字段的规则检测, 对象属性需要进行验证; 在定义对象的字段上使用@NotNull、@NotBlank、@NotEmpty常用作入参检验；javax包里的
+需要注意的是 @Valid 和 BindingResult 是一一对应的，如果有多个 @Valid，那么每个 @Valid 后面都需要添加 BindingResult 用于接收 bean 中的校验信息
+- `@JsonInclude(value = JsonInclude.Include.NON_NULL)` : 序列化不为null的那些属性，是jackson包下的，spring自带的序列化工具就是它
 
 ### linux命令
 #### 文件和目录

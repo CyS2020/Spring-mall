@@ -20,7 +20,7 @@ public class RunTimeExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseBody
-    //@ResponseStatus(HttpStatus.FORBIDDEN) 返回指定的错误码
+    //@ResponseStatus(HttpStatus.NOT_FOUND) 返回指定的错误码
     public ResponseVo<User> handle(RuntimeException e) {
         return ResponseVo.error(ResponseEnum.ERROR, e.getMessage());
     }
