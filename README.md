@@ -219,6 +219,7 @@ HandlerMapping、Controller(单个Http请求处理过程中的控制器)和ViewR
 - 如何查看是否前后端分离架构：F12 -> NetWork -> XHR -> Response
 - Content-Type:application/json 这是调用API的请求格式，在请求头中(Headers)
 - 开发顺序: Dao -> Service -> Controller
+- 涉及对象: 前端表单对象、业务处理对象、数据库存储对象、后端返回对象
 - 单元测试: Service层(主要的业务逻辑)，Controller层的Api由测试人员负责
 - 对于无法自动生成的查询接口需要在xml文件中编写按照格式编写sql语句，Mybatis打印SQL语句
 - Spring中自带MD5散列算法DigestUtils类，实现对password的加密
@@ -243,10 +244,6 @@ cookie(sessionId)  ->   session(HttpSession)
 #### 耗时
 - http(请求微信api) > 内网 + 磁盘(mysql) > 内存
 - 代码中最忌讳的就是在for循环中做http、sql
-
-#### pageSize与pageNum
-- pageSize表示一页显示几条数据, 根据这个数据来分页, 一页显示pageSize条数据, 一共total/pageSize页
-- pageNum表示显示第几页, 根据刚才划分的页total/pageSize页, 指定显示哪一页
 
 #### NoSQL数据库
 - Redis(高性能), MongoDB(海量数据), Elasticsearch/HBase(大数据)
@@ -318,7 +315,7 @@ DNS1=192.168.1.1
 - `@DeleteMapping` : 注解将HTTP的DELETE请求映射到特定的处理程序方法, 等于@RequestMapping(method = RequestMethod.DELETE)
 - `@PutMapping` : 注解将HTTP的PUT请求映射到特定的处理程序方法, 等于@RequestMapping(method = RequestMethod.PUT)
 - `@GetMapping` : 注解将HTTP的GET请求映射到特定的处理程序方法, 等于@RequestMapping(method = RequestMethod.GET)
-- `@PathVariable` : 将 URL 中的占位符绑定到控制器的处理方法的参数中，占位符使用{}括起来
+- `@PathVariable` : 将 URL 中的占位符绑定到控制器的处理方法的参数中，占位符使用{}括起来；url中的占位符与?后的参数是有区别的
 - `@RequestBody` : 用来接收前端传递给后端的json字符串中的数据的(请求体中的数据的), 前端使用POST方式进行提交, spring组装json为对象
 - `@RequestParam` : 用来处理body使用x-www-form-urlencoded来请求; url中的?后面参数也可以用@RequestParam来接收
 - `@ResponseBody` : 将java对象转为json格式的数据, 将controller的方法返回的对象通过适当的转换器转换为指定的格式之后，写入到response对象的body区
@@ -331,6 +328,7 @@ DNS1=192.168.1.1
 - `@Mapper` : 添加了@Mapper注解之后这个接口在编译时会生成相应的实现类, 需要注意的是:这个接口中不可以定义同名的方法，因为会生成相同的id也就是说这个接口是不支持重载的
 - `@Select("select * from mall_category where id = #{id}")` : 对于多个参数来说, 每个参数之前都要加上@Param注解, 要不然会找不到对应的参数进而报错
 - `@MapperScan(basePackages = "xxx")` : 想要每个接口都要变成实现类, 那么需要在每个接口类上加上@Mapper注解比较麻烦解决这个问题用@MapperScan, 是在Springboot启动类上面添加
+- `@Param` : sql语句查询时传入的不是基本数据类型时，要使用该注解绑定下参数到xml中
 
 #### 其他注解
 - `@Valid` : 对象属性字段的规则检测, 对象属性需要进行验证; 在定义对象的字段上使用@NotNull、@NotBlank、@NotEmpty常用作入参检验；javax包里的
