@@ -20,8 +20,11 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author: CyS2020
@@ -92,12 +95,17 @@ public class CartServiceImpl implements ICartService {
         boolean selectAll = true;
         Integer cartTotalQuantity = 0;
         BigDecimal cartTotalPrice = BigDecimal.ZERO;
+
+        // 优化查库操作
+        Set<Integer> productIdSet = entries.keySet().stream().map(Integer::parseInt).collect(Collectors.toSet());
+        List<Product> productList = productMapper.selectByProductIdSet(productIdSet);
+        Map<Integer, Product> productMap = new HashMap<>();
+        productList.forEach(product -> productMap.put(product.getId(), product));
+
         for (Map.Entry<String, String> entry : entries.entrySet()) {
             Integer productId = Integer.parseInt(entry.getKey());
             Cart cart = gson.fromJson(entry.getValue(), Cart.class);
-
-            // TODO 需要优化, 使用mysql里的in
-            Product product = productMapper.selectByPrimaryKey(productId);
+            Product product = productMap.get(productId);
             if (product != null) {
                 CartProductVo cartProductVo = new CartProductVo(productId,
                         cart.getQuantity(),
