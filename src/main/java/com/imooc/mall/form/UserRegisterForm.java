@@ -13,7 +13,7 @@ public class UserRegisterForm {
 
     // @NotBlank 用于string判断空格
     // @NotEmpty 用于集合判断数组空
-    // @NotNull  判断是否为null
+    // @NotNull  用于基本数据类型
     @NotBlank(message = "用户名不能为空")
     private String username;
 

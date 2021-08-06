@@ -153,6 +153,7 @@ CREATE TABLE `mall_order` (
 - Mybatis-plugin: 用来查找方法对应的xml中的sql语句
 1. 此款插件是在IDEA里安装的，替代品为：Free MyBaits plugin
 2. 在xml文件手动编写xml语句时，如果编写正确插件的箭头就会指向对应的接口的
+3. 整个过程就是在拼凑sql查询语句，非<>代码就是固定的sql语句，<>内的代码是在根据参数在拼凑变化的那部分
 - Mybaits-PageHelper: 数据库分页插件
 
 #### Spring
