@@ -20,10 +20,10 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -99,8 +99,7 @@ public class CartServiceImpl implements ICartService {
         // 优化查库操作
         Set<Integer> productIdSet = entries.keySet().stream().map(Integer::parseInt).collect(Collectors.toSet());
         List<Product> productList = productMapper.selectByProductIdSet(productIdSet);
-        Map<Integer, Product> productMap = new HashMap<>();
-        productList.forEach(product -> productMap.put(product.getId(), product));
+        Map<Integer, Product> productMap = productList.stream().collect(Collectors.toMap(Product::getId, Function.identity()));
 
         for (Map.Entry<String, String> entry : entries.entrySet()) {
             Integer productId = Integer.parseInt(entry.getKey());

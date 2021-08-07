@@ -142,6 +142,7 @@ CREATE TABLE `mall_order` (
 
 #### 框架理解
 - 想要框架去执行某些文件xml中的方法需要让框架找到xml, 则需要application.yml配置文件
+- 关于配置文件application.yml的配置，可以通过命令行在部署的时候修改，例如修改日志输出位置等
 - java代码与框架交互，要么通过注解要么配置xml, 将调用转向注解或者xml的具体行为，java定义抽象
 
 #### mybatis三剑客
@@ -255,7 +256,7 @@ cookie(sessionId)  ->   session(HttpSession)
 
 #### 基础知识
 - 关于Linux命令, vim命令, docker命令的补充学习; java的http客户端学习
-- 外网无法访问的调试技巧curl http://127.0.0.1:8080/xxx接口xxx
+- 外网无法访问的调试技巧curl http://127.0.0.1:8080/xxx接口xxx 查看内网访问能否成功
 
 ### centos7环境
 #### 配置静态网址
@@ -280,15 +281,39 @@ DNS1=192.168.1.1
 - systemctl daemon-reload systemctl restart docker.service 启动docker
 - 安装mysql, 修改访问密码, 重启mysql并开启远程访问的ip地址(使用数据库服务器的地址), Navicat连接成功
 - systemctl start  mysqld.service启动mysql systemctl status mysqld.service查看mysql状态
+- systemctl start  dcoker 启动docker 然后查看下状态命令同查mysql的命令
 - docker run -d -p 5672:5672 -p 15672:15672 rabbitmq:3.8.2-management 启动rabbitmq
 - docker run -d -p 6379:6379 redis:5.0.7 启动redis 并在管理界面创建相应的队列payNotify
 - 下载运行natapp使用内网穿透访问虚拟机ip地址, 接收微信和支付宝发来的异步通知
 - 运行两个jar包, 即mall项目与pay项目, 一定要先运行natapp再启动pay项目, 保证natapp在Online状态
 
+#### 关于启动java服务
+- 运行jar包命令：java -jar -Dspring.profiles.active=prod -Dserver.port=8081 -Dlogging.path=/root/logs/mall/ /root/mall.jar
+- 或者作为服务后台运行，创建文件/etc/systemd/system/mall.service 然后运行 systemctl daemon-reload 与 systemctl start mall
+```
+[Unit]
+Description=mall
+After=syslog.target
+
+[Service]
+User=root
+ExecStart=/user/local/jdk1.8.0_231/bin/java -jar -Dspring.profiles.active=prod -Dserver.port=8081 -Dlogging.path=/root/logs/mall/ /root/mall.jar
+
+
+[Install]
+WantedBy=multi-user.target
+```
+
 #### 反向代理
 - http://192.168.1.4/api/products  前端访问的
 - http://192.168.1.4:8080/products 后端提供的
-- 通过修改nginx配置文件来进行反向代理cd /user/local/nginx/conf/ 
+- 通过修改nginx配置文件来进行反向代理cd /user/local/nginx/conf/
+- 添加如下代理后 nginx -s reload 刷新配置
+```
+location /api/ {
+    proxy_pass http://127.0.0.1:8080/;
+}
+```
 
 ### Spring常用注解
 #### `spring-boot-starter-test`

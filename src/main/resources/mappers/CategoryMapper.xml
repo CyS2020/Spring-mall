@@ -19,7 +19,7 @@
     <!--    id为接口对应的方法， parameterType表示入参类型全路径， resultMap表示上方定义的返回值类型-->
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         select
-        <!--        refid表示查询某些列上方已经定义好了-->
+        <!--    refid表示查询某些列上方已经定义好了-->
         <include refid="Base_Column_List"/>
         from mall_category
         where id = #{id,jdbcType=INTEGER}
@@ -28,6 +28,7 @@
         delete from mall_category
         where id = #{id,jdbcType=INTEGER}
     </delete>
+    <!--    注意其他两个参数: useGeneratedKeys="true" 和 keyProperty="id"-->
     <insert id="insert" parameterType="com.imooc.mall.pojo.Category">
         insert into mall_category (id, parent_id, name,
         status, sort_order, create_time,
@@ -36,6 +37,7 @@
         #{status,jdbcType=BIT}, #{sortOrder,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
         #{updateTime,jdbcType=TIMESTAMP})
     </insert>
+    <!--    创建时间更新时间交给mysql处理，xml文件中记得删除-->
     <insert id="insertSelective" parameterType="com.imooc.mall.pojo.Category">
         insert into mall_category
         <trim prefix="(" suffix=")" suffixOverrides=",">
