@@ -259,12 +259,14 @@ cookie(sessionId)  ->   session(HttpSession)
 - 外网无法访问的调试技巧curl http://127.0.0.1:8080/xxx接口xxx 查看内网访问能否成功
 
 ### centos7环境
-#### 配置静态网址
-- VMware - 编辑 -虚拟网络编辑 -选择桥接模式 -桥接至主机网络适配器上；虚拟机网络适配器选桥接模式(不勾选)
+#### 配置静态ip
+- VMware - 编辑 -虚拟网络编辑 -选择桥接模式 -桥接至主机网络适配器上
 - dhclient命令生成ip，然后修改vim /etc/sysconfig/network-scripts/ifcfg-ens33
-- 配置静态ip地址，注意的是先查看主机ip地址信息配置子网掩码，网关，dns; 网络适配器等
-- 配置静态网址, 虚拟机linux执行systemctl restart network.service就可以连接外网
-- 虚拟机上网，主机与虚拟机互相ping，另外主机防火墙--文件和打印机共享(回显请求-ICMpv4-in)设为：是
+- 配置静态ip地址，注意的是先查看主机ip地址信息然后配置ip，子网掩码，网关，dns; 虚拟机网络适配器选桥接模式(不勾选复制...)
+- 配置静态ip后, 虚拟机linux执行systemctl restart network.service就可以连接外网
+- 虚拟机上网，主机与虚拟机互相ping，才算成功；一般情况下主机都能ping通虚拟机，只是虚拟机有时候ping不通主机
+- 控制面板\网络和 Internet\网络和共享中心\高级共享设置--启用文件和打印机共享，虚拟机即可ping通主机
+- 如果还出现ping不通的情况检查下面的参数肯定写错了，检查不出来就删了从写
 ```
 BOOTPROTO=static
 ONBOOT=yes
