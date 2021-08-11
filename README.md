@@ -1,5 +1,37 @@
 ### 项目总结
 
+#### 开发工具的插件安装
+- IDEA: Free MyBaits plugin; Lombok; One Dark Theme;
+- VS code: 
+Auto Close Tag; Auto Rename Tag; Chinese (Simplified); ESLint; HTML CSS Support; 
+HTML Snippets; JavaScript (ES6) code snippets; Live Server; open in browser; Vetur
+
+#### 创建SpringBoot项目
+- 下载maven, 并配置maven settings.xml文件
+- 使用github创建仓库, .gitignore选java, 复制url地址然后使用IDEA -> File -> New -> Project from Version Control
+- https://start.spring.io/ 使用网站创建一个springBoot项目(微服务), 选择必要的starter, 然后下载
+```
+<mirror> 
+    <id>alimaven</id>  
+    <name>aliyun maven</name>  
+    <url>http://maven.aliyun.com/nexus/content/groups/public/</url>  
+    <mirrorOf>central</mirrorOf> 
+ </mirror>
+<profile>
+    <id>jdk-1.8</id>
+    <activation>
+        <activeByDefault>true</activeByDefault>
+        <jdk>1.8</jdk>
+    </activation>
+    
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+    </properties>
+</profile>
+```
+
 #### 设计表
 ```sql
 DROP TABLE IF EXISTS `mall_order`;
@@ -45,93 +77,6 @@ CREATE TABLE `mall_order` (
 - 一个表中可以有多个唯一性索引，但只能有一个主键。
 - 主键列不允许空值, 而唯一性索引列允许空值
 
-#### 运行jar包
-- java -jar mall-0.0.1-SNAPSHOT.jar 命令运行主程序
-- java -cp [jar包的路径] [类路径] 命令行运行某个类
-- 将所有依赖的包打在一起，使用下面的插件，可以配置主类入口信息，下面没有配置
-```
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-shade-plugin</artifactId>
-    <version>2.4.3</version>
-    <executions>
-        <execution>
-            <phase>package</phase>
-            <goals>
-                <goal>shade</goal>
-            </goals>
-        </execution>
-    </executions>
-</plugin>
-```
-
-#### 使用官网创建springBoot项目
-- https://start.spring.io/
-- 选择自己所需要的开发环境，以及依赖的starter
-
-#### 使用社区版IDEA创建SpringBoot项目
-- 创建maven项目
-- 继承springBoot项目版本自己确定
-```
-<parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.1.7.RELEASE</version>
-    <relativePath/> <!-- lookup parent from repository -->
-</parent>
-```
-- 基本的依赖和插件
-```
-<dependencies>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-    <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.mybatis.spring.boot</groupId>
-        <artifactId>mybatis-spring-boot-starter</artifactId>
-        <version>2.1.0</version>
-    </dependency>
-</dependencies>
-    
-<build>
-    <plugins>
-        <plugin>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-        </plugin>
-        <!-- 用于生成dao和pojo的插件, 非必选项 -->
-        <plugin>
-            <groupId>org.mybatis.generator</groupId>
-            <artifactId>mybatis-generator-maven-plugin</artifactId>
-            <version>1.3.7</version>
-            <configuration>
-                <overwrite>true</overwrite>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
-```
-- 创建.gitignore文件忽略有些文件提交
-- 配置文件resources/application.yml文件, 主要是数据库信息
-- 在resources文件加下创建templates和static包
-- 创建xxxApplication.java并编写程序main函数
-- 创建xxxApplicationTest.java并作为单元测试的主类
-
-
 #### java对象
 - po: persistent object 持久层对象
 - pojo: plain ordinary java object 普通java对象只有属性+get/set方法
@@ -151,6 +96,16 @@ CREATE TABLE `mall_order` (
 2. mvn mybatis-generator:generate 生成命令
 3. 插件会去连接数据库，找到表，然后生成表的类，查询接口，链接mysql的xml
 4. 项目中会把使用mybatis插件生成代码的任务单独设置一个模块，不和业务代码扯在一起；mybatis依赖还是需要的
+```
+<plugin>
+    <groupId>org.mybatis.generator</groupId>
+    <artifactId>mybatis-generator-maven-plugin</artifactId>
+    <version>1.3.7</version>
+    <configuration>
+        <overwrite>true</overwrite>
+    </configuration>
+</plugin>
+```
 - Mybatis-plugin: 用来查找方法对应的xml中的sql语句
 1. 此款插件是在IDEA里安装的，替代品为：Free MyBaits plugin
 2. 在xml文件手动编写xml语句时，如果编写正确插件的箭头就会指向对应的接口的
@@ -288,6 +243,26 @@ DNS1=8.8.8.8
 - docker run -d -p 6379:6379 redis:5.0.7 启动redis 并在管理界面创建相应的队列payNotify
 - 下载运行natapp使用内网穿透访问虚拟机ip地址, 接收微信和支付宝发来的异步通知
 - 运行两个jar包, 即mall项目与pay项目, 一定要先运行natapp再启动pay项目, 保证natapp在Online状态
+
+#### 运行jar包
+- java -jar mall-0.0.1-SNAPSHOT.jar 命令运行主程序
+- java -cp [jar包的路径] [类路径] 命令行运行某个类
+- 将所有依赖的包打在一起，使用下面的插件，可以配置主类入口信息，下面没有配置
+```
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-shade-plugin</artifactId>
+    <version>2.4.3</version>
+    <executions>
+        <execution>
+            <phase>package</phase>
+            <goals>
+                <goal>shade</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
 
 #### 关于启动java服务
 - 运行jar包命令：java -jar -Dspring.profiles.active=prod -Dserver.port=8081 -Dlogging.path=/root/logs/mall/ /root/mall.jar
