@@ -11,6 +11,7 @@ HTML Snippets; JavaScript (ES6) code snippets; Live Server; open in browser; Vet
 - 使用github创建仓库, .gitignore选java, 复制url地址然后使用IDEA -> File -> New -> Project from Version Control
 - https://start.spring.io/ 使用网站创建一个springBoot项目(微服务), 选择必要的starter, 然后下载
 - 修改springBoot版本，启动项目若启动失败查看pom文件中其他依赖有没有配置与springBoot相一致的版本
+- 清理文件保留.idea, src, pom.xml, .iml, .gitignore文件,其他的和代码无关的文件可以删除
 ```
 <mirror> 
     <id>alimaven</id>  
